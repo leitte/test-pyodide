@@ -8,6 +8,10 @@ npm create svelte@latest
 npm i -D @fontsource/roboto 
 ```
 
+Enable github pages
+- enable pages in github
+- copy the .github/workflows
+- edit the svelte.config.js
 
 Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
 
