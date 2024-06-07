@@ -1,8 +1,11 @@
 <script>
-    import AutoComplete from "simple-svelte-autocomplete"
-    import Tags from "svelte-tags-input";
     import State from "./State.svelte";
     import ChangeOfState from "./ChangeOfState.svelte";
+    import Switch from "./Switch.svelte";
+    import List from "./List.svelte";
+    import PythonRunner from "./PythonRunner.svelte";
+
+    import { pyodide } from "./stores";
 
     const colors = ["White", "Red", "Yellow", "Green", "Blue", "Black"]
     let selectedColor;
@@ -12,6 +15,12 @@
 
     let states = [{id: 1}];
     let changeOfState = [];
+
+    const stateVariableOptions = {
+        p: {value: NaN, unit: "Pascal"},
+        T: {value: NaN, unit: "K"},
+        V: {value: NaN, unit: "m<sup>3</sup>"}
+    };
 
     function addState() {
         changeOfState = [...changeOfState, {id: `${states.length},${states.length+1}`}]
@@ -28,42 +37,20 @@ Sidebar
 </div>
 
 <div class="main">
-    <h1>Welcome to KnowTD</h1>
+    <h1>Welcome to K+++TD</h1>
 
     <form>
     <label class="form-section">System</label>
     <div class="wrapper section-entry">
-        <div class="switch-element">
-            <label class="switch">
-                <input type="checkbox" checked disabled>
-                <span class="slider round"></span>
-            </label>
-            closed
-        </div>
-        <div class="switch-element">
-            <label class="switch">
-                <input type="checkbox" disabled>
-                <span class="slider round"></span>
-            </label>
-            in motion
-        </div>
-        <div class="switch-element">
-            <label class="switch">
-                <input type="checkbox" checked disabled>
-                <span class="slider round"></span>
-            </label>
-            in equilibrium
-        </div>
+        <Switch label="closed" disabled/>
+        <Switch label="in motion" checked={false} disabled/>
+        <Switch label="in equilibrium" disabled/>
     </div>
     
     <label class="form-section">Material</label>
     <div class="wrapper section-entry">
         <div class="switch-element">
-            <label class="switch">
-                <input type="checkbox" checked disabled>
-                <span class="slider round"></span>
-            </label>
-            ideal gas
+            <Switch label="ideal gas" disabled/>
         </div>
     </div>
     
@@ -73,6 +60,7 @@ Sidebar
     </div>
     <div class="section-entry wrapper">
         {#each states as state}
+            <List name="State" id={state.id.toString()} variableOptions={stateVariableOptions}/>
             <State id={state.id} />
         {/each}
     </div>
@@ -85,6 +73,11 @@ Sidebar
             {/each}
         </div>
     {/if}
+
+    <label/>
+    <PythonRunner />
+
+    {$pyodide}
     </form>
 </div>
 
@@ -157,30 +150,7 @@ states {JSON.stringify(states)}
         cursor: pointer;
     }
 
-    .btn-group button {
-    background-color: #04AA6D; /* Green background */
-    border: 1px solid green; /* Green border */
-    color: white; /* White text */
-    padding: 10px 24px; /* Some padding */
-    cursor: pointer; /* Pointer/hand icon */
-    float: left; /* Float the buttons side by side */
-    }
 
-    .btn-group button:not(:last-child) {
-    border-right: none; /* Prevent double borders */
-    }
-
-    /* Clear floats (clearfix hack) */
-    .btn-group:after {
-    content: "";
-    clear: both;
-    display: table;
-    }
-
-    /* Add a background color on hover */
-    .btn-group button:hover {
-    background-color: #3e8e41;
-    }
 
     .wrapper {
         display: flex;
@@ -189,66 +159,5 @@ states {JSON.stringify(states)}
         max-width: auto;
     }
 
-    /* The switch - the box around the slider */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 30px;
-  height: 20px;
-}
 
-/* Hide default HTML checkbox */
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-/* The slider */
-.slider {
-  position: absolute;
-  /*cursor: pointer;*/
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 15px;
-  width: 15px;
-  left: 3px;
-  bottom: 2.5px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-input:checked + .slider {
-  background-color: #2196F3;
-}
-
-input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked + .slider:before {
-  -webkit-transform: translateX(9px);
-  -ms-transform: translateX(9px);
-  transform: translateX(9px);
-}
-
-/* Rounded sliders */
-.slider.round {
-  border-radius: 34px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
-}
 </style>

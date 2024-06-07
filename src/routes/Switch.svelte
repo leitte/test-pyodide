@@ -1,7 +1,7 @@
 <script>
     export let label = "";
     export let checked = true;
-    export let disabled = true;
+    export let disabled = false;
 </script>
 
 <div class="switch-element" class:disabled>
