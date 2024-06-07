@@ -5,7 +5,7 @@
 npm create svelte@latest
 
 # add dependencies
-npm i -D @fontsource/roboto 
+npm i -D @fontsource/roboto @sveltejs/adapter-static
 ```
 
 Enable github pages
