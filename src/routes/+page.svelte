@@ -4,7 +4,7 @@
     import Switch from "./Switch.svelte";
     import List from "./List.svelte";
     import PythonRunner from "./PythonRunner.svelte";
-    import { getClassProperties } from "./PythonRunner";
+    //import { getClassProperties } from "./PythonRunner";
 
     import { pyodide } from "./stores";
 
@@ -30,7 +30,7 @@
 
     function updateInformation(event) {
         console.log("update", event)
-        console.log(getClassProperties(event.detail.concept))
+        //console.log(getClassProperties(event.detail.concept))
     }
 </script>
 
