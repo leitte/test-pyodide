@@ -4,6 +4,7 @@
     import Switch from "./Switch.svelte";
     import List from "./List.svelte";
     import PythonRunner from "./PythonRunner.svelte";
+    import { getClassProperties } from "./PythonRunner";
 
     import { pyodide } from "./stores";
 
@@ -29,6 +30,7 @@
 
     function updateInformation(event) {
         console.log("update", event)
+        console.log(getClassProperties(event.detail.concept))
     }
 </script>
 
@@ -60,7 +62,7 @@ Sidebar
     </div>
     <div class="section-entry wrapper">
         {#each states as state}
-            <List name="State" id={state.id.toString()} variableOptions={stateVariableOptions}/>
+            <List name="State" id={state.id.toString()} variableOptions={stateVariableOptions} on:info={updateInformation}/>
             <State id={state.id} />
         {/each}
     </div>

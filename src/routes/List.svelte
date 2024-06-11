@@ -35,7 +35,7 @@
     function helpButtonClicked() {
         /*alert("Sorry, additional information not implemented yet.")*/
         dispatch('info', {
-            concept: "ChangeOfState"
+            concept: name
         });
     }
 </script>
