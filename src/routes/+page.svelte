@@ -4,15 +4,46 @@
     import Switch from "./Switch.svelte";
     import List from "./List.svelte";
     import PythonRunner from "./PythonRunner.svelte";
-    import { getClassProperties } from "./PythonRunner";
+    import { getClassProperties, getAttributes } from "./PythonRunner";
+    import config_thmo from '$lib/config_thmo.json'
+    import { onMount } from "svelte";
+    import Ontology from "./Ontology";
+
 
     import { pyodide } from "./stores";
+    import { graphStore } from "./PythonRunner";
 
     const colors = ["White", "Red", "Yellow", "Green", "Blue", "Black"]
     let selectedColor;
     const systemTypeOptions = ["closed", "open", "isoliert"];
     let systemType = [];
     let sysType = "open";
+
+    let systemAttributes = []; // = await getAttributes('System');
+    let materialAttributes = [];
+    let stateAttributes = [];
+
+    /** @type {import('./$types').PageData} */
+	export let data;
+
+    $: {
+        $graphStore;
+        systemAttributes = getAttributes('System');
+        materialAttributes = getAttributes('Material');
+        stateAttributes = getAttributes('State');
+    }
+
+    /*
+    $: attrOptions = initAttributes('State', stateAttributes);
+
+    async function initAttributes(className, stateAttributes) {
+        return stateAttributes.reduce((opt, key) => {
+            opt[key] = {value: config_thmo?.State?.[a] ?? true,
+                        disabled: config_thmo.System?.fixed?.includes(a)
+            }
+        }, {});
+    }
+        */
 
     let states = [{id: 1}];
     let changeOfState = [];
@@ -28,10 +59,30 @@
         states = [...states, {id: states.length+1}]
     }
 
-    function updateInformation(event) {
+    async function updateInformation(event) {
         console.log("update", event)
-        console.log(getClassProperties(event.detail.concept))
+        console.log(await getClassProperties(event.detail.concept))
+        console.log(await getAttributes('System'))
     }
+
+    let ontology = null;
+    let error = null;
+
+    let world = {}
+
+    onMount(async () => {
+        try {
+            const url = 'https://raw.githubusercontent.com/leitte/test-pyodide/main/static/thermodynamics_concepts.owl.ttl';
+            ontology = await Ontology.createInstance(url)
+
+            world['system'] = {attributes: ontology.attributes('System')}
+            world['material'] = {attributes: ontology.attributes('Material')}
+            world['states'] = {S1: {attributes: ontology.attributes('State')}}
+        } catch (err) {
+            error = err.message;
+        }
+    });
+    //console.log(config_thmo, config_thmo.System.fixed.includes("closed"))
 </script>
 
 <div class="sidebar">
@@ -41,19 +92,68 @@ Sidebar
 <div class="main">
     <h1>Welcome to K+++TD</h1>
 
+    <div>{@html JSON.stringify(data)}</div>
+
+    {#if ontology }
+        Ontology {ontology.size}
+    {:else}
+        Loading ontology
+    {/if }
+
     <form>
+        {#if world.system}
+            <label class="form-section">System</label>
+            <div class="wrapper section-entry">
+                {#each Object.keys(world.system.attributes) as attr}
+                    <Switch label="{attr}" 
+                        checked={world.system.attributes[attr].value}
+                        disabled={world.system.attributes[attr].fixed}
+                    />
+                {/each}
+            </div>
+        {/if}
+
+        {#if world.material}
+            <label class="form-section">Material</label>
+            <div class="wrapper section-entry">
+                {#each Object.keys(world.material.attributes) as attr}
+                    <Switch label="{attr}" 
+                        checked={world.material.attributes[attr].value}
+                        disabled={world.material.attributes[attr].fixed}
+                    />
+                {/each}
+            </div>
+        {/if}
+
+        {#if world.states}
+            <label class="form-section">States</label>
+            {#each Object.keys(world.states) as state}
+                <List name="State" id="1" attributeOptions={world.states[state].attributes}/>
+            {/each}
+        {/if}
+
     <label class="form-section">System</label>
     <div class="wrapper section-entry">
-        <Switch label="closed" disabled/>
-        <Switch label="in motion" checked={false} disabled/>
-        <Switch label="in equilibrium" disabled/>
+        {#await systemAttributes then attr}
+            {#each attr as a}
+                <Switch label="{a}" 
+                    checked={config_thmo?.System?.[a] ?? true}
+                    disabled={config_thmo.System.fixed.includes(a)}
+                />
+            {/each}
+        {/await}
     </div>
     
     <label class="form-section">Material</label>
     <div class="wrapper section-entry">
-        <div class="switch-element">
-            <Switch label="ideal gas" disabled/>
-        </div>
+        {#await materialAttributes then attr}
+            {#each attr as a}
+                <Switch label="{a}" 
+                    checked={config_thmo?.Material?.[a] ?? true}
+                    disabled={config_thmo.Material?.fixed?.includes(a)}
+                />
+            {/each}
+        {/await}
     </div>
     
     <div class="form-section">
@@ -61,9 +161,19 @@ Sidebar
         <input type="button" class="add-btn" value="+" on:click={addState}/>
     </div>
     <div class="section-entry wrapper">
+        <!--
+        {#await attrOptions then attr}
+            {#each attr as a}
+                {a}
+            {/each}
+        {/await}
+        -->
         {#each states as state}
             <List name="State" id={state.id.toString()} variableOptions={stateVariableOptions} on:info={updateInformation}/>
+            <!--
             <State id={state.id} />
+            -->
+            
         {/each}
     </div>
     

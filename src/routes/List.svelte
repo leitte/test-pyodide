@@ -47,6 +47,11 @@
 
     <div class="stretch-height">
         {#if nEntries > 0}
+            {#each Object.entries(attributeOptions) as [attr,props]}
+                <div class="item">
+                    <Switch label={attr} checked={props.value} disabled={props.fixed}/>
+                </div>
+            {/each}
             {#each Object.entries(attributes) as [attr,props]}
                 <div class="item">
                     <Switch label={attr} checked={props.value} disabled={props.disabled}/>
