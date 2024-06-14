@@ -9,9 +9,11 @@ npm i -D @fontsource/roboto @sveltejs/adapter-static
 ```
 
 Enable github pages
-- enable pages in github
-- copy the .github/workflows
-- edit the svelte.config.js
+- Enable pages in github
+- Enable static site generation in svelte project https://kit.svelte.dev/docs/adapter-static
+  - copy the .github/workflows
+  - edit the svelte.config.js
+  - add the +layout.js file
 
 Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
 
