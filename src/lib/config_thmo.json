@@ -1,0 +1,12 @@
+{
+  "System": {
+    "motion": false,
+    "closed": true,
+    "equilibrium": true,
+    "homogeneous": true,
+    "fixed": ["closed", "motion", "equilibrium", "homogeneous"]
+  },
+  "Material": {
+    "fixed": ["homogeneous"]
+  }
+}
