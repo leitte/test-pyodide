@@ -10,6 +10,7 @@ class Ontology {
             Object.entries(this.g.namespaces).forEach(([key,value]) => {
                 this[key.toUpperCase()] = $rdf.Namespace(value);
             });
+            this['SCHEMA'] = $rdf.Namespace('http://schema.org/')
 
             //this.attributes('Transition');
         } catch (err) {
@@ -49,8 +50,8 @@ class Ontology {
     }
 
     getAttributeConfig(className, attrName) {
-        return {value: config_thmo[className]?.[attrName],
-                fixed: config_thmo[className]?.fixed?.includes(attrName)}
+        return {value: config_thmo[className]?.[attrName] ?? true,
+                fixed: config_thmo[className]?.fixed?.includes(attrName) ?? false}
     }
 
     attributes(className) {
@@ -75,55 +76,52 @@ class Ontology {
         })
 
         return attr
-        console.log(node.uri, this.getLabel(node))
-        console.log(attr)
-
-        /*
-        const subclasses = this.g.each($rdf.sym(this.THMO_CONCEPTS('Transition')), this.RDFS('subClassOf'), null);
-        subclasses.forEach(s => {
-            const restrictions = this.g.each(s, this.RDF('type'), this.OWL('Restriction'));
-            restrictions.forEach(r => {
-                console.log(r)
-            })
-        })
-        console.log(subclasses.length)
-        subclasses.slice(0,3).forEach(s =>{
-            console.log(s)
-        })
-            */
-
-/*
-        const subclasses = this.g.each(this.THMO_CONCEPTS(className), this.RDFS('subClassOf'), null);
-        subclasses.forEach(subclass => {
-            if (this.g.holds(subclass, this.RDF('type'), this.OWL('Restriction'))) {
-                
-            }
-        });
-
-        const rdf = $rdf.Namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#');
-        const rdfs = $rdf.Namespace('http://www.w3.org/2000/01/rdf-schema#');
-        const owl = $rdf.Namespace('http://www.w3.org/2002/07/owl#');
-        const xsd = $rdf.Namespace('http://www.w3.org/2001/XMLSchema#');
-      
-        const objects = this.g.each(undefined, rdfs('subClassOf'), undefined);
-        const properties = [];
-        
-        objects.forEach(object => {
-          const restrictions = this.g.each(object, rdf('type'), owl('Restriction'));
-          restrictions.forEach(restriction => {
-            const onProperty = this.g.any(restriction, owl('onProperty'));
-            const range = this.g.any(onProperty, rdfs('range'));
-            if (range && range.uri === xsd('boolean').uri) {
-              properties.push(onProperty);
-            }
-          });
-        });
-      
-        console.log(properties);
-        */
     }
 
-    
+    isA(class_uri, super_uri) {
+        const superClasses = this.g.each(class_uri, this.RDFS('subClassOf'), null);
+
+        for (const sc of superClasses) {
+            if (sc.equals(super_uri)) {
+                return true;
+            }
+        }
+        return false
+    }
+
+    variables(className) {
+        //console.log("Collecting variables of ", className)
+        const node = this.THMO_CONCEPTS(className)
+        const sc = this.g.each(node, this.RDFS('subClassOf'), null);
+        const vars = {}
+
+        sc.forEach(s => {
+            if (this.hasType(s, this.OWL('Restriction'))) {
+                const property = this.g.any(s, this.OWL('onProperty'), null);
+                const label = this.getLabel(property);
+                const range = this.g.any(property, this.RDFS('range'), null) || this.g.any(s, this.OWL('allValuesFrom'), null);
+
+                if (property && 
+                    this.isA(range, this.THMO_CONCEPTS('Variable')) &&
+                    !(label in vars)) 
+                {
+                    const name = this.getLabel(range);
+                    const unit = this.g.any(range, this.SCHEMA('Unit'))?.toString();
+                    
+                    vars[label] = {uri: property.uri, 
+                                   range: range.uri,
+                                   name: name,
+                                   value: NaN,
+                                   unit: unit,
+                                   active: false
+                                }
+                    //console.log(property.uri, unit?.toString(), range.uri, this.g.holds(property, this.RDFS('range')))
+                }
+            } 
+        })
+
+        return vars
+    }
 }
 
 export default Ontology;

@@ -8,22 +8,31 @@
     export let attributeOptions = {};
     export let variableOptions = {};
 
-    let attributes = {"in equilibrium": {value: true, disabled: true}};
-    let variables = {};
+    let attributes = {};
+    let variables = [];
     let input = "";
-    const options = {
-        Q: {value: NaN, unit: "J"},
-    };
-    //const attributeOptions = ["isochoric","isothermal","polytropic","isobaric","isenthalpic","isentropic","adjabatic"]
+
     const dispatch = createEventDispatcher();
 
-    $: nEntries = Object.keys(variables).length + Object.keys(attributes).length;
+    $: nEntries = Object.keys(variables).length + Object.keys(attributeOptions).length;
 
     function handleKeypress(event) {
         if (event.keyCode === 13) {
             let [variable,value] = input.split("=").map(part => part.trim())
             if (variable in attributeOptions) {
                 attributes[variable] = {value: true, disabled: false};
+            }
+            else if (variable in variableOptions) {
+                variableOptions[variable].active = true;
+                if (!variables.includes(variable)) {
+                    variables.push(variable);
+                }
+                
+                const num = parseFloat(value);
+                if (!isNaN(num) && isFinite(num)) {
+                    console.log("value", value)
+                    variableOptions[variable].value = num;
+                }
             }
             else {
                 variables[variable] = {value: value, unit: "xxx"};
@@ -35,8 +44,17 @@
     function helpButtonClicked() {
         /*alert("Sorry, additional information not implemented yet.")*/
         dispatch('info', {
-            concept: name
+            concept: name,
+            variables: variableOptions
         });
+    }
+
+    function removeVariable(event) {
+        console.log(event)
+        console.log(event.srcElement.name)
+        const v = event.srcElement.name;
+        variableOptions[v].value = NaN;
+        variableOptions[v].active = false;
     }
 </script>
 
@@ -58,13 +76,12 @@
                 </div>
             {/each}
             <div class="table">
-                {#each Object.entries(variables) as [variable,props]}
-                    <label class="variable">{variable}<sub>{id}</sub></label>
-                    <input type="number" class="value" placeholder="NaN" bind:value={props.value}>
-                    {#if variable in variableOptions}
-                        <label class="unit">{@html variableOptions[variable].unit}</label>
-                    {:else}
-                        <label class="unit"></label>
+                {#each variables as v}
+                    {#if variableOptions[v].active}
+                        <label class="variable">{v}<sub>{id}</sub></label>
+                        <input type="number" class="value" placeholder="NaN" bind:value={variableOptions[v].value}>
+                        <label class="unit">{@html variableOptions[v].unit}</label>
+                        <button name="{v}" on:click={removeVariable}>x</button>
                     {/if}
                 {/each}
             </div>
@@ -80,7 +97,7 @@
     <div class="item add">
         <label>+</label> 
         <input type="text" class="stretch-width" placeholder="Enter a variable..." on:keypress={handleKeypress} bind:value={input}/>
-        <button on:click|preventDefault={helpButtonClicked}>?</button>
+        <button class="info-button" on:click|preventDefault={helpButtonClicked}>?</button>
     </div>
 </div>
 
@@ -123,7 +140,7 @@
 
     .table {
         display: grid;
-        grid-template-columns: 1fr 2fr 1fr;
+        grid-template-columns: 1fr 2fr 1fr 20px;
         gap: 5px 15px;
         padding: 0 1em;
     }
@@ -134,7 +151,7 @@
         min-width: 50px;
     }
 
-    button {
+    .info-button {
         border-radius: 50%;
         width: 1.5em;
         height: 1.5em;
