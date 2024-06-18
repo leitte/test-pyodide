@@ -27,32 +27,43 @@
     {#if data}
         <label class="heading">
             <b>{data.label}<sub>{""}</sub></b>
+            {data.id}
         </label>
     {/if}
     {#each attributes as attr}
         <div class="item c1">
-            <Switch bind:checked={data.properties[attr]['value']}/>
+            <Switch 
+                bind:checked={data.properties[attr].value}
+                disabled={data.properties[attr].fixed}
+            />
         </div>
         
         <label class="label">{label(attr)}</label>
+        <!--
         <label class="item c3">{data.properties[attr]['value']}</label>
+        -->
     {/each}
     <div class="hline" style:justify-self="stretch"/>
     {#each variables as v}
         <label class="item c1">{data.properties[v]['rdfs:label']}</label>
         <input class="c2" type="number" placeholder="NaN" bind:value={data.properties[v].value} />
-        <label class="item c3">{data.properties[v]['unit']}</label>
+        <label class="item c3 unit">{data.properties[v]['unit']}</label>
+        <button class="c4">X</button>
     {/each}
+    <div class="hline" style:justify-self="stretch"/>
+    <label class="item c1">+</label>
+    <input class="input"/>
+    <button class="c4">?</button>
 </div>
 
 <style>
     .wrapper {
-        width: 250px;
+        width: 270px;
 		border: 1px solid #aaa;
 		border-radius: 2px;
 		box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
         display: grid;
-        grid-template-columns: minmax(15px, 1fr) 1fr minmax(15px, 1fr) minmax(10px, 1fr);
+        grid-template-columns: minmax(40px, .6fr) 1.4fr 70px 25px;
     }
 
     .item {
@@ -87,7 +98,23 @@
 
     .label {
         grid-column: 2/3;
-        background-color: bisque;
         padding: 5px;
+    }
+
+    .unit {
+        font-size: 85%;
+    }
+
+    .input {
+        grid-column: 2 / 4;
+        margin: 2.5px;
+    }
+
+    button.c4 {
+        cursor: pointer;
+        border: none;
+        background: none;
+        font-size: 85%;
+        color: #333;
     }
 </style>

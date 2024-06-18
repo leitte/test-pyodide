@@ -231,14 +231,30 @@ class Ontology {
         return Array.from(superClasses)
     }
 
-    createClass(className) {
+    createClass(className, id) {
         const classObj = {
             label: className,
+            id: id,
             parents: this.getParents(className),
             properties: this.getProperties(className)
         }
 
         return classObj
+    }
+
+    updateClass(obj, config) {
+        Object.entries(config).forEach(([key,val]) => {
+            if (key in obj.properties) {
+                obj.properties[key].value = val;
+            }
+            else if (key === "fixed") {
+                val.forEach((v) => {
+                    if (v in obj.properties) {
+                        obj.properties[v].fixed = true;
+                    }
+                })
+            }
+        })
     }
 }
 

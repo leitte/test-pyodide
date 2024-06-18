@@ -1,0 +1,41 @@
+{
+    "System": [{
+        "id": "I",
+        "material": "Gas",
+        "change_of_state": "A"
+    }],
+    "PureMaterial": [{
+        "id": "Gas",
+        "R": 287,
+        "c_v": 1010,
+        "equation_of_state": {
+            "id": "eos_gas",
+            "model": "ideal gas"
+        }
+    }],
+    "State": [
+        {
+            "id": "1",
+            "v": 0.05,
+            "T": 298
+        },
+        {
+            "id": "2",
+            "v": 0.02
+        }
+    ],
+    "ChangeOfState": [
+        {
+            "id": "A",
+            "initial_state": "1",
+            "final_state": "2",
+            "transition": {
+                "id": "12",
+                "adiabatic": true,
+                "reversible": true,
+                "is_isentropic": true
+            }
+        }
+    ],
+    "required": ["w_12"]
+}

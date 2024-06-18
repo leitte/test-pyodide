@@ -1,14 +1,13 @@
 <script>
-    import ChangeOfState from "./ChangeOfState.svelte";
-    import Switch from "./Switch.svelte";
     import List from "./List.svelte";
     import PythonRunner from "./PythonRunner.svelte";
     import { onMount } from "svelte";
     import Ontology from "./Ontology";
     import Concept from "./Concept.svelte";
+    import config_thmo from '$lib/config_thmo.json'
+    //import Problem1 from '$lib/SampleProblems/Problem1.json'
 
     import { pyodide } from "./stores";
-    import VariableItem from "./VariableItem.svelte";
 
 
     function addState() {
@@ -30,16 +29,46 @@
     let world = {}
     let mysys = {};
     let mystate = {};
+    let mymat = {};
+
+    let world2 = {};
+    let systems = [];
+
+    $: systems = Object.entries(world2).reduce((acc, [key,obj]) => {
+        if (obj?.label === "System") {
+            acc[key] = obj;
+        }
+        return obj
+    }, {});
 
     onMount(async () => {
         try {
             const url = 'https://raw.githubusercontent.com/leitte/test-pyodide/main/static/thermodynamics_concepts.owl.ttl';
             ontology = await Ontology.createInstance(url)
 
-            ontology.variables('System')
+            /*
+            Object.entries(Problem1).forEach(([className,val]) => {
+                console.log(className,val)
+                if (Array.isArray(val)) {
+                    val.forEach((v) => {
+                        console.log("creating object", v)
+                        const obj = ontology.createClass(className, v.id)
+                        ontology.updateClass(obj, v)
+                        console.log(obj)
+                        world2[v.id] = obj;
+                    })
+                }
+                else {
+                    const obj = ontology.createClass(className, val.id)
+                    console.log(obj)
+                }
+            })
+            */
 
-            mysys = ontology.createClass('System'); 
-            mystate = ontology.createClass('State');
+            mysys = ontology.createClass('System', 'system');
+            ontology.updateClass(mysys, config_thmo.System)
+            mystate = ontology.createClass('State', 'S1');
+            mymat = ontology.createClass('PureMaterial', 'M1');
 
             world['system'] = {attributes: ontology.attributes('System'),
                                variables: ontology.variables('System')
@@ -56,6 +85,7 @@
                                     variables: ontology.variables('State')
                                 },
                             }
+
         } catch (err) {
             error = err.message;
         }
@@ -151,9 +181,11 @@ Sidebar
         {/if}
         -->
 
+
         <label class="form-section">Item</label>
         <div class="section-entry wrapper">
             <Concept bind:data={mysys} />
+            <Concept bind:data={mymat} />
             <Concept bind:data={mystate} />
         </div>
 
@@ -248,7 +280,11 @@ Sidebar
             -->
 
     <label/>
-    <PythonRunner />
+
+    <!--
+        <PythonRunner />
+    -->
+    
 
         </div>
 </div>

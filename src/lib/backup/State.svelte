@@ -1,5 +1,5 @@
 <script>
-    import Switch from "./Switch.svelte";
+    import Switch from "../../routes/Switch.svelte";
 
     export let id = 0;
     let stateAttributes = {"in equilibrium": true};

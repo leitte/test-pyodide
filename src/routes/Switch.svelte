@@ -6,7 +6,7 @@
 
 <div class="switch-element" class:disabled>
     <label class="switch">
-        <input type="checkbox" checked='{checked}' disabled='{disabled}'>
+        <input type="checkbox" bind:checked='{checked}' disabled='{disabled}'>
         <span class="slider round"></span>
     </label>
     {label}
