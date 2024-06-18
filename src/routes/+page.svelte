@@ -5,6 +5,7 @@
     import PythonRunner from "./PythonRunner.svelte";
     import { onMount } from "svelte";
     import Ontology from "./Ontology";
+    import Concept from "./Concept.svelte";
 
     import { pyodide } from "./stores";
     import VariableItem from "./VariableItem.svelte";
@@ -27,6 +28,8 @@
     let error = null;
 
     let world = {}
+    let mysys = {};
+    let mystate = {};
 
     onMount(async () => {
         try {
@@ -34,6 +37,9 @@
             ontology = await Ontology.createInstance(url)
 
             ontology.variables('System')
+
+            mysys = ontology.createClass('System'); 
+            mystate = ontology.createClass('State');
 
             world['system'] = {attributes: ontology.attributes('System'),
                                variables: ontology.variables('System')
@@ -145,6 +151,12 @@ Sidebar
         {/if}
         -->
 
+        <label class="form-section">Item</label>
+        <div class="section-entry wrapper">
+            <Concept bind:data={mysys} />
+            <Concept bind:data={mystate} />
+        </div>
+
         <label class="form-section">System & Material</label>
         <div class="section-entry wrapper">
             {#if world.system}
@@ -243,11 +255,11 @@ Sidebar
 
 <!--
     {$pyodide}
+-->
 
     <pre style:font-size=".6em">
-    {JSON.stringify(world, null, 2)}
+    {JSON.stringify(mysys, null, 2)}
 </pre>
--->
 
 
 <!--
@@ -323,6 +335,7 @@ states {JSON.stringify(states)}
         flex-direction: row;
         gap: 15px;
         max-width: auto;
+        align-items: flex-start;
     }
 
     .list {
