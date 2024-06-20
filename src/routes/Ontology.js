@@ -1,7 +1,15 @@
 import * as $rdf from 'rdflib';
 import config_thmo from '$lib/config_thmo.json'
+import State from '$lib/backup/State.svelte';
 
 class Ontology {
+    CONCEPT_ABBREVIATIONS = {
+        System: "Sys",
+        Material: "M",
+        State: "S",
+        ChangeOfState: "CoS"
+    }
+
     constructor(ontologyTTL, url) {
         this.g = $rdf.graph();
         const mimeType = 'text/turtle'
@@ -10,7 +18,7 @@ class Ontology {
             Object.entries(this.g.namespaces).forEach(([key,value]) => {
                 this[key.toUpperCase()] = $rdf.Namespace(value);
             });
-            this['SCHEMA'] = $rdf.Namespace('http://schema.org/')
+            //this['SCHEMA'] = $rdf.Namespace('http://schema.org/')
 
             //this.attributes('Transition');
         } catch (err) {
@@ -148,13 +156,16 @@ class Ontology {
         const range = this.g.any(prop, this.RDFS('range'), null) ?? 
                           this.g.any(prop, this.OWL('allValuesFrom'), null) ?? 
                           this.XSD('string');
-        propObj['rdfs:range'] = range.uri;
+        propObj['range'] = range.uri;
         propObj.value = undefined;
         //propObj.parents ??= this.getParents($rdf.sym(propObj['rdfs:range']))
-        propObj.type ??= this.getType(propObj['rdfs:range'])
+        propObj.type ??= this.getType(propObj['range'])
         if (propObj.type.includes('Variable')) {
             propObj.unit = this.g.any(range, this.SCHEMA('Unit'), null)?.value;
             propObj.mathExpression = this.g.any(range, this.SCHEMA('mathExpression'), null)?.value;
+        }
+        if (propObj.type.includes('Equation')) {
+            propObj.applicable = undefined;
         }
         if (minCard?.value != null) {
             propObj['owl:minCardinality'] = parseInt(minCard.value);
@@ -231,15 +242,66 @@ class Ontology {
         return Array.from(superClasses)
     }
 
-    createClass(className, id) {
+    isDefinedInNamespace(className, namespace) {
+        return this.g.any(namespace(className), this.RDF('type'), null);
+    }
+
+    extractClassName(uri) {
+        // Split the URI by # and /, and take the last segment
+        const segments = uri.split(/[#/]/);
+        return segments[segments.length - 1];
+    }
+
+    getAbbreviation(name, parents=undefined) {
+        const className = this.extractClassName(name);
+        let parentsValid = parents ?? this.getParents(className);
+        const parentNames = parentsValid.map((parentUri) => this.extractClassName(parentUri));
+        const firstNameWithAbbreviation = [className, ...parentNames].find(key => key in this.CONCEPT_ABBREVIATIONS);
+        return firstNameWithAbbreviation ? this.CONCEPT_ABBREVIATIONS[firstNameWithAbbreviation] : className;
+    }
+
+    createConceptClass(className, id) {
         const classObj = {
             label: className,
             id: id,
             parents: this.getParents(className),
-            properties: this.getProperties(className)
+            properties: this.getProperties(className),
         }
-
+        const abbreviation = this.getAbbreviation(className, classObj.parents);
+        classObj.name = `${abbreviation}_${id}`;
         return classObj
+    }
+
+    getMathExpression(node) {
+        return this.g.any(node, this.SCHEMA('mathExpression'), null)?.value ?? undefined;
+    }
+
+    getCodeExpression(node) {
+        return this.g.any(node, this.THMO_EQUATIONS('codeExpression'), null)?.value ?? undefined;
+    }
+
+    createEquationClass(className, id) {
+        const node = this.THMO_EQUATIONS(className);
+        const obj = {
+            className,
+            id,
+            name: `XXX_${id}`,
+            mathExpression: this.getMathExpression(node),
+            codeExpression: this.getCodeExpression(node),
+            preconditions: "missing"
+        }
+        return obj;
+    }
+
+    createClass(className, id) {
+        if (this.isDefinedInNamespace(className, this.THMO_EQUATIONS)) {
+            return this.createEquationClass(className, id);
+        }
+        else if (this.isDefinedInNamespace(className, this.THMO_CONCEPTS)) {
+            return this.createConceptClass(className, id);
+        }
+        console.log('unknown type')
+        return {}
     }
 
     updateClass(obj, config) {
@@ -253,6 +315,14 @@ class Ontology {
                         obj.properties[v].fixed = true;
                     }
                 })
+            }
+        })
+    }
+
+    findApplicableEquations(obj) {
+        Object.entries(obj).forEach(([key,property]) => {
+            if (property.type.contains('Equation')) {
+
             }
         })
     }

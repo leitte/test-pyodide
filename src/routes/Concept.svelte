@@ -5,12 +5,17 @@
 
     let attributes = [];
     let variables = [];
+    let concepts = [];
+    let equations = [];
 
-    $: if (data.properties) {
-        attributes = Object.keys(data?.properties).filter(key => data.properties[key].type.includes('bool')).sort();
+    function filterProperties(propertyType) {
+        return Object.keys(data?.properties).filter(key => data.properties[key].type.includes(propertyType)).sort()
     }
     $: if (data.properties) {
-        variables = Object.keys(data?.properties).filter(key => data.properties[key].type.includes('Variable')).sort();
+        attributes = filterProperties('bool');
+        variables = filterProperties('Variable');
+        concepts = filterProperties('Concept');
+        equations = filterProperties('Equation');
     }
 
     function label(prop) {
@@ -27,7 +32,7 @@
     {#if data}
         <label class="heading">
             <b>{data.label}<sub>{""}</sub></b>
-            {data.id}
+            <b>{data.name}</b>
         </label>
     {/if}
     {#each attributes as attr}
@@ -44,11 +49,24 @@
         -->
     {/each}
     <div class="hline" style:justify-self="stretch"/>
+    {#each concepts as concept}
+        <div class="item concept-label">
+           {concept} 
+        </div>
+        <div class="item c34">
+            {data.properties[concept]?.value?.name}
+        </div>
+    {/each}
+    <div class="hline" style:justify-self="stretch"/>
     {#each variables as v}
         <label class="item c1">{data.properties[v]['rdfs:label']}</label>
         <input class="c2" type="number" placeholder="NaN" bind:value={data.properties[v].value} />
         <label class="item c3 unit">{data.properties[v]['unit']}</label>
         <button class="c4">X</button>
+    {/each}
+    <div class="hline" style:justify-self="stretch"/>
+    {#each equations as equation}
+        <label class="item c-all">{data.properties[equation].range?.split(/[#/]/).at(-1)}</label>
     {/each}
     <div class="hline" style:justify-self="stretch"/>
     <label class="item c1">+</label>
@@ -77,6 +95,15 @@
         padding: 5px;
     }
 
+    .concept-label {
+        grid-column: 1 / 3;
+        justify-self: end;
+    }
+
+    .c34 {
+        grid-column: 3 / -1;
+    }
+
     input {
         min-width: 50px;
         margin: 2.5px;
@@ -94,6 +121,10 @@
 
     .c2 {
         grid-column: 2 / 3;
+    }
+
+    .c-all {
+        grid-column: 1 / -1;
     }
 
     .label {

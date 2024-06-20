@@ -6,7 +6,8 @@
     "homogeneous": true,
     "fixed": ["closed", "motion", "equilibrium", "homogeneous"]
   },
-  "Material": {
+  "PureMaterial": {
+    "equation_of_state": "ideal gas",
     "fixed": ["homogeneous"]
   }
 }

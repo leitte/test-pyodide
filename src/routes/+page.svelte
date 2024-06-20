@@ -6,7 +6,7 @@
     import Concept from "./Concept.svelte";
     import config_thmo from '$lib/config_thmo.json'
     //import Problem1 from '$lib/SampleProblems/Problem1.json'
-
+    import { RuleHandler } from "./RuleHandler";
     import { pyodide } from "./stores";
 
 
@@ -43,7 +43,8 @@
 
     onMount(async () => {
         try {
-            const url = 'https://raw.githubusercontent.com/leitte/test-pyodide/main/static/thermodynamics_concepts.owl.ttl';
+            //const url = 'https://raw.githubusercontent.com/leitte/test-pyodide/main/static/thermodynamics_concepts.owl.ttl';
+            const url = 'https://raw.githubusercontent.com/leitte/test-pyodide/main/src/lib/thermodynamics.owl.ttl'
             ontology = await Ontology.createInstance(url)
 
             /*
@@ -65,10 +66,18 @@
             })
             */
 
-            mysys = ontology.createClass('System', 'system');
+            mysys = ontology.createClass('System', 1);
             ontology.updateClass(mysys, config_thmo.System)
-            mystate = ontology.createClass('State', 'S1');
-            mymat = ontology.createClass('PureMaterial', 'M1');
+            mystate = ontology.createClass('State', '1');
+            mymat = ontology.createClass('PureMaterial', '1');
+            ontology.updateClass(mymat, config_thmo.PureMaterial)
+            ontology.updateClass(mysys, {state: mystate, material: mymat})
+            ontology.updateClass(mystate, {system: mysys})
+
+            console.log("#####", mystate.properties.system.value)
+
+            let idealGasLaw = ontology.createClass('IdealGasLaw', 'igl1')
+            console.log("ideal gas law", idealGasLaw);
 
             world['system'] = {attributes: ontology.attributes('System'),
                                variables: ontology.variables('System')
@@ -86,6 +95,7 @@
                                 },
                             }
 
+            const ruleHander = new RuleHandler();
         } catch (err) {
             error = err.message;
         }
@@ -291,11 +301,11 @@ Sidebar
 
 <!--
     {$pyodide}
--->
 
     <pre style:font-size=".6em">
-    {JSON.stringify(mysys, null, 2)}
+    {JSON.stringify(mystate, null, 2)}
 </pre>
+-->
 
 
 <!--
