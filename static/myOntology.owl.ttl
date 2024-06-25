@@ -564,13 +564,6 @@ thermo:ThermalDensityEquation a owl:Class ;
     skos:inScheme thermo:definingEquations ;
     thermo:codeExpression "rho_{state} = 1/v_{state}" .
 
-thermo:idealGasEquations.owl.ttl a owl:Ontology ;
-    rdfs:label "idealGasEquations" ;
-    dcterms:license "https://creativecommons.org/publicdomain/zero/1.0/" ;
-    dcterms:title "Thermodynamics Equations Schema" ;
-    pav:version "0.0.1" ;
-    skos:definition "Thermodynamics model for equations." .
-
 thermo:is_isenthalpic a owl:DatatypeProperty ;
     rdfs:label "is_isenthalpic" ;
     rdfs:range xsd:boolean ;
