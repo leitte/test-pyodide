@@ -1,6 +1,6 @@
 <script>
     import List from "./List.svelte";
-    import PythonRunner from "./PythonRunner.svelte";
+    //import PythonRunner from "./PythonRunner.svelte";
     import { onMount } from "svelte";
     import Ontology from "./Ontology";
     import Concept from "./Concept.svelte";
@@ -73,6 +73,7 @@
             ontology.updateClass(mymat, config_thmo.PureMaterial)
             ontology.updateClass(mysys, {state: mystate, material: mymat})
             ontology.updateClass(mystate, {system: mysys})
+            ontology.findApplicableEquations(mystate)
 
             console.log("#####", mystate.properties.system.value)
 

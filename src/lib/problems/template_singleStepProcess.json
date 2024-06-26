@@ -1,0 +1,47 @@
+{
+  "name": "Template: Single step process",
+  "pureMaterials": [
+    {
+      "id": "M_1",
+      "index": "1",
+      "homogeneous": true
+    }
+  ],
+  "system": {
+    "id": "Sys_1",
+    "index": "1",
+    "closed": true,
+    "equilibrium": true,
+    "motion": false,
+    "homogeneous": true,
+    "material": "M_1",
+    "states": [
+      "S_1",
+      "S_2"
+    ],
+    "changes_of_state": [
+      "CoS_12"
+    ]
+  },
+  "states": [
+    {
+      "id": "S_1",
+      "index": "1",
+      "equilibrium": true
+    },
+    {
+      "id": "S_2",
+      "index": "2",
+      "equilibrium": true
+    }
+  ],
+  "changes_of_state": [
+    {
+      "id": "CoS_12",
+      "index": "12",
+      "equilibrium": true,
+      "motion": false
+    }
+  ],
+  "@type": "Problem"
+}

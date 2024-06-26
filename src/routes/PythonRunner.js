@@ -36,7 +36,7 @@ export const graphStore2 = createGraphStore();
 
 export async function getClassProperties( className ) {
     if (graphSize() === 0) {
-        await initGraph('https://raw.githubusercontent.com/leitte/test-pyodide/main/static/thermodynamics_concepts.owl.ttl')
+        await initGraph('https://raw.githubusercontent.com/leitte/test-pyodide/main/static/thermodynamics.owl.ttl')
     }
 
     const g = get(graphStore);

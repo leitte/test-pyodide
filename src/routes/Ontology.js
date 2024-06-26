@@ -1,6 +1,7 @@
 import * as $rdf from 'rdflib';
 import config_thmo from '$lib/config_thmo.json'
 import State from '$lib/backup/State.svelte';
+import { RuleHandler } from './RuleHandler';
 
 class Ontology {
     CONCEPT_ABBREVIATIONS = {
@@ -24,6 +25,8 @@ class Ontology {
         } catch (err) {
             console.log(err)
         }
+
+        this.ruleHandler = new RuleHandler();
     }
 
     static async createInstance(url) {
@@ -320,9 +323,12 @@ class Ontology {
     }
 
     findApplicableEquations(obj) {
-        Object.entries(obj).forEach(([key,property]) => {
-            if (property.type.contains('Equation')) {
-
+        console.log("checking equations", obj.name)
+        Object.entries(obj.properties).forEach(([key,property]) => {
+            if (property.type.includes('Equation')) {
+                //console.log(key, property.range)
+                const className = this.extractClassName(property.range)
+                console.log("rule checking", className, this.ruleHandler.checkRules(className, obj))
             }
         })
     }

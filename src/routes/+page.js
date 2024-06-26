@@ -6,6 +6,7 @@ import { get } from 'svelte/store';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ fetch, params }) {
+    /*
     const url = 'https://raw.githubusercontent.com/leitte/test-pyodide/main/static/thermodynamics_concepts.owl.ttl';
     const response = await fetch(url);
     if (response.ok) {
@@ -36,6 +37,7 @@ export async function load({ fetch, params }) {
 
         console.log("data2",data3)
     }
+        */
     /*
 
     const concepts = ["System", "Material", "State"];

@@ -1,0 +1,64 @@
+{
+  "name": "Problem 1",
+  "pureMaterials": [
+    {
+      "id": "M_1",
+      "index": "1",
+      "homogeneous": true,
+      "R": {
+        "value": 287.0
+      },
+      "c_v": {
+        "value": 1010.0
+      }
+    }
+  ],
+  "system": {
+    "id": "Sys_1",
+    "index": "1",
+    "closed": true,
+    "equilibrium": true,
+    "motion": false,
+    "homogeneous": true,
+    "material": "M_1",
+    "states": [
+      "S_1",
+      "S_2"
+    ],
+    "changes_of_state": [
+      "CoS_12"
+    ]
+  },
+  "states": [
+    {
+      "id": "S_1",
+      "index": "1",
+      "equilibrium": true,
+      "T": {
+        "value": 298.0
+      },
+      "v": {
+        "value": 0.05
+      }
+    },
+    {
+      "id": "S_2",
+      "index": "2",
+      "equilibrium": true,
+      "v": {
+        "value": 0.02
+      }
+    }
+  ],
+  "changes_of_state": [
+    {
+      "id": "CoS_12",
+      "index": "12",
+      "equilibrium": true,
+      "motion": false,
+      "adiabatic": true,
+      "reversible": true
+    }
+  ],
+  "@type": "Problem"
+}
