@@ -11,6 +11,8 @@
     function updateProblem() {
         console.log('problem changed')
         const refrenceProblem = ontologyInterface.createClassObject('Problem', problemDefinition)
+        console.log(ontologyInterface.knownInstances)
+        ontologyInterface.getEquations('SystemInStateEquation', ontologyInterface.knownInstances.S_1)
     }
 
     onMount(async() => {

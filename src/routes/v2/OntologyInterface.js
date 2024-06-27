@@ -13,6 +13,7 @@ export class OntologyInterface {
             });
             
             this.knownClasses = this.getKnownClasses();
+            this.knownInstances = {};
             console.log("classes", this.knownClasses.size)
             //this['SCHEMA'] = $rdf.Namespace('http://schema.org/')
 
@@ -131,11 +132,21 @@ export class OntologyInterface {
         return Object.values(nodeProperties).includes(rangeNode.uri)
     }
 
-    getEquations(className) {
-        const equationNodes = this.getDescendents(this.THERMO(className));
+    getEquations(equationClassName, instance) {
+        const equationNodes = this.getDescendents(this.THERMO(equationClassName));
         //const equations = equationNodes.filter((equationNode) => this.hasSlotWithRange(equationNode, node))
         console.log(equationNodes.map((n) => n.uri))
         return equationNodes
+    }
+
+    registerInstance(instance) {
+        if ('id' in instance) {
+            this.knownInstances[instance.id] = instance;
+        } else {
+            // TODO: instance has no id; throw error
+            console.log("#### instance without id detected", instance)
+        }
+        
     }
 
     setValues(classInstance, data) {
@@ -157,7 +168,8 @@ export class OntologyInterface {
                         classInstance[slot] = [];
                         slotData.forEach((objData) => {
                             const targetObject = this.createClassObject(rangeClassName, objData);
-                            classInstance[slot].push(targetObject)
+                            this.registerInstance(targetObject);
+                            classInstance[slot].push(targetObject.id)
                         })
                     }
                     else if (typeof slotData === 'object') {
@@ -167,7 +179,9 @@ export class OntologyInterface {
                         if (rangeIsVariable && !('id' in slotData) && 'index' in data) {
                             slotData['id'] = slot + `_${data['index']}`
                         }
-                        classInstance[slot] = this.createClassObject(rangeClassName, slotData)
+                        const instance = this.createClassObject(rangeClassName, slotData);
+                        this.registerInstance(instance);
+                        classInstance[slot] = instance.id;
                     }
                     else {
 
