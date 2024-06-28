@@ -1,41 +1,69 @@
 {
-    "System": [{
-        "id": "I",
-        "material": "Gas",
-        "change_of_state": "A"
-    }],
-    "PureMaterial": [{
-        "id": "Gas",
-        "R": 287,
-        "c_v": 1010,
+    "name": "Problem 1",
+    "pureMaterials": [
+      {
+        "id": "M_1",
+        "index": "1",
+        "homogeneous": true,
         "equation_of_state": {
-            "id": "eos_gas",
-            "model": "ideal gas"
-        }
-    }],
-    "State": [
-        {
-            "id": "1",
-            "v": 0.05,
-            "T": 298
+          "id": "eos_gas",
+          "model": "ideal gas"
         },
-        {
-            "id": "2",
-            "v": 0.02
+        "R": {
+          "value": 287.0
+        },
+        "c_v": {
+          "value": 1010.0
         }
+      }
     ],
-    "ChangeOfState": [
-        {
-            "id": "A",
-            "initial_state": "1",
-            "final_state": "2",
-            "transition": {
-                "id": "12",
-                "adiabatic": true,
-                "reversible": true,
-                "is_isentropic": true
-            }
+    "system": {
+      "id": "Sys_1",
+      "index": "1",
+      "closed": true,
+      "equilibrium": true,
+      "motion": false,
+      "homogeneous": true,
+      "material": "M_1",
+      "states": [
+        "S_1",
+        "S_2"
+      ],
+      "changes_of_state": [
+        "CoS_12"
+      ]
+    },
+    "states": [
+      {
+        "id": "S_1",
+        "index": "1",
+        "equilibrium": true,
+        "T": {
+          "value": 298.0
+        },
+        "v": {
+          "value": 0.05
         }
+      },
+      {
+        "id": "S_2",
+        "index": "2",
+        "equilibrium": true,
+        "v": {
+          "value": 0.02
+        }
+      }
     ],
-    "required": ["w_12"]
-}
+    "changes_of_state": [
+      {
+        "id": "CoS_12",
+        "index": "12",
+        "equilibrium": true,
+        "motion": false,
+        "adiabatic": true,
+        "reversible": true
+      }
+    ],
+    "@type": "Problem"
+  }
+  
